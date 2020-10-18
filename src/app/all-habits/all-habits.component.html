@@ -1,6 +1,6 @@
 <div class="all-habits">
 	<h1>All Habits</h1>
-	<button mat-raised-button color="accent">
+	<button mat-raised-button color="accent" routerLink="/habit-form">
       Add New Habit
   </button>
   <div *ngFor="let habit of habits; let i = index">
@@ -19,6 +19,7 @@
         <mat-icon
           class="habit-icon"
           color="primary"
+          [routerLink]="['/habit-form', i]"
           >edit</mat-icon
         >
         <mat-icon class="habit-icon" color="warn" (click)="onDelete(i)"

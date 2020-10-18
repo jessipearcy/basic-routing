@@ -1,5 +1,6 @@
 import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { HABITS } from '../data/habits';
 import { Habit } from '../models/habit';
 
@@ -9,7 +10,6 @@ import { Habit } from '../models/habit';
   styleUrls: ['./habit-form.component.scss'],
 })
 export class HabitFormComponent implements OnInit {
-  public habit: Habit;
   public habits: Habit[];
   public editingIndex: number;
   public editing = false;
@@ -20,18 +20,22 @@ export class HabitFormComponent implements OnInit {
     description: new FormControl(''),
   });
 
-  constructor() {}
+  constructor(private router: Router, private route: ActivatedRoute) {}
 
   ngOnInit(): void {
     this.habits = HABITS;
 
-    if (this.habit) {
-      this.editingIndex = this.habits.indexOf(this.habit);
-      this.setEditForm(this.habit);
+    const routeParam = this.route.snapshot.paramMap.get('id');
+
+    if (routeParam) {
+      this.editingIndex = +routeParam;
+      this.editing = true;
+      this.setEditForm();
     }
   }
 
-  public setEditForm(habit: Habit) {
+  public setEditForm() {
+    const habit = HABITS[this.editingIndex];
     this.habitForm.patchValue({
       name: habit.name,
       frequency: habit.frequency,
@@ -42,15 +46,18 @@ export class HabitFormComponent implements OnInit {
   public onSubmit() {
     const habit = this.habitForm.value as Habit;
 
-    if (this.habit) {
+    if (this.editing) {
       this.habits.splice(this.editingIndex, 1, habit);
     } else {
       this.habits.push(habit);
     }
     this.exitForm();
+
+    this.router.navigate(['/']);
   }
 
   exitForm() {
     this.habitForm.reset();
+    this.editing = false;
   }
 }
